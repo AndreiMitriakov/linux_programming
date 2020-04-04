@@ -2,6 +2,7 @@
 #include <string.h>
 #include <dirent.h>
 
+
 int main(int argc, int ** argv) {
     DIR *d;
     struct dirent *dir;
