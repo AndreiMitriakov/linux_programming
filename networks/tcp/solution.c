@@ -5,23 +5,20 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdlib.h>
 
 #define BUFSIZE 5000
 
 struct sockaddr_in local;
 
-int cmpfunc (const void * x1, const void * x2) {
-    return ( *(char*)x2 - *(char*)x1 );
-}
-
-char * mutate (char * str) {
-    qsort(str, strlen(str), sizeof(char), cmpfunc);
-    return str;
+int cmp (char x1, char x2) {
+    return x2 - x1;
 }
 
 int server (int port) {
     int ss = socket(AF_INET, SOCK_STREAM, 0);
     int cs;
+
     inet_aton("127.0.0.1", &local.sin_addr);
     local.sin_port = htons(port);
     local.sin_family = AF_INET;
@@ -31,21 +28,22 @@ int server (int port) {
 
     cs = accept(ss, NULL, NULL);
 
-    while (1) {
+    while (1){
         char buf[BUFSIZE] = {0};
         read(cs, buf, BUFSIZE);
-        if (!strcmp(buf,"OFF\n"))
+        if (strstr(buf, "OFF\n") != NULL)
             break;
-        mutate(buf);
-        //printf("%s\n", buf);
-        write(cs, strcat(buf, "\n"), strlen(buf)+2);
+        qsort(buf, strlen(buf), sizeof(char), cmp);
+        //  send back to the client
+        write(cs, buf, strlen(buf)+1);
     }
     close(cs);
     return 0;
 }
 
 int main (int argc, char ** argv) {
-    if (argc != 2) return -1;
+    if (argc != 2)
+        return -1;
 
     server(atoi(argv[1]));
 

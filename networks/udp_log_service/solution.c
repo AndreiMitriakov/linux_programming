@@ -23,16 +23,12 @@ int main(int c, char **v)
 
     int result = bind(s, (struct sockaddr*) &local, sizeof(local));
 
-
-
     while (1){
         char buf[BUFSIZE] = {0};
         read(s, buf, BUFSIZE);
-        printf("%s", buf);
-        if (strcmp(buf, "OFF\n"))
+        if (strstr(buf, "OFF\n") != NULL)
             break;
-
+        printf("%s\n", buf);
     }
-
     return 0;
 }
